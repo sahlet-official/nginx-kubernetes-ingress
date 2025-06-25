@@ -59,13 +59,10 @@ for rel in releases:
         release = rel
         break
 
-# # 4. Print out the notes
+# 4. Print out the notes
 if release is not None:
-    # print(release.body or "[no release notes]")
-
     sections = parse_sections(release.body or "")
 
-    # 6) Print out your structured data
     catagories = {}
     for title, items in sections.items():
         if any(x in title for x in ["Other Changes", "Documentation", "Maintenance", "Tests"]):
@@ -76,10 +73,10 @@ if release is not None:
             change_title = change.group(1)
             pr_link = change.group(2)
             pr_number = re.search(r"^.*/(\d+)$", pr_link)
-            # print(f"- [{pr_number.group(1)}]({pr_link}) {change_title}")
             parsed.append({"pr_number": pr_number.group(1), "pr_url": pr_link, "title": change_title})
+            # update the PR title with a capitalized first letter
+            parsed[-1]["title"] = parsed[-1]["title"].capitalize()
         catagories[title] = parsed
-
 
 data = {
     "version": NIC_VERSION,
@@ -89,7 +86,7 @@ data = {
     "K8S_VERSIONS": K8S_VERSIONS,
 }
 
-# 4) Render with Jinja2
+# Render with Jinja2
 print(template.render(**data))
 
 # todo
