@@ -39,7 +39,7 @@ def parse_sections(markdown: str):
 
 
 def format_pr_groups(prs):
-    # join the PR's inti a comma, space separated string
+    # join the PR's into a comma, space separated string
     comma_sep_prs = "".join([f"{dep['details']}, " for dep in prs])
 
     # strip the last comma and space, and add the first PR title
