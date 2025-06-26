@@ -38,6 +38,18 @@ def parse_sections(markdown: str):
     return sections
 
 
+def format_pr_groups(prs):
+    # join the PR's inti a comma, space separated string
+    comma_sep_prs = "".join([f"{dep['details']}, " for dep in prs])
+
+    # strip the last comma and space, and add the first PR title
+    trimmed_comma_sep_prs = f"{comma_sep_prs.rstrip(', ')} {prs[0]['title']}"
+
+    # split the string by the last comma and join with an ampersand
+    split_result = trimmed_comma_sep_prs.rsplit(",", 1)
+    return " &".join(split_result)
+
+
 token = os.environ.get("GITHUB_TOKEN")
 
 # using an access token
@@ -57,66 +69,64 @@ for rel in releases:
     if rel.tag_name == f"v{NIC_VERSION}":
         release = rel
         break
+if release is None:
+    print(f"Release v{NIC_VERSION} not found in {ORG}/{REPO}.")
+    exit(1)
 
-# 4. Print out the notes
-if release is not None:
-    sections = parse_sections(release.body or "")
+# Parse the release body to extract sections
+sections = parse_sections(release.body or "")
 
-    # print(json.dumps(sections))
+# Close github connection after use
+g.close()
 
-    catagories = {}
-    dependencies_title = ""
-    for title, changes in sections.items():
-        if any(x in title for x in ["Other Changes", "Documentation", "Maintenance", "Tests"]):
-            continue
-        parsed = []
-        go_dependencies = []
-        docker_dependencies = []
-        for line in changes:
-            change = re.search("^(.*) by @.* in (.*)$", line)
-            change_title = change.group(1)
-            pr_link = change.group(2)
-            pr_number = re.search(r"^.*pull/(\d+)$", pr_link).group(1)
-            if "Dependencies" in title:
-                dependencies_title = title
-                if "go group" in change_title or "go_modules group" in change_title:
-                    change_title = "Bump Go dependencies"
-                    pr = {"details": f"[{pr_number}]({pr_link})", "title": change_title}
-                    go_dependencies.append(pr)
-                elif (
-                    "Docker image update" in change_title
-                    or "docker group" in change_title
-                    or "docker-images group" in change_title
-                    or "in /build" in change_title
-                ):
-                    change_title = "Bump Docker dependencies"
-                    pr = {"details": f"[{pr_number}]({pr_link})", "title": change_title}
-                    docker_dependencies.append(pr)
-                else:
-                    pr = f"[{pr_number}]({pr_link}) {change_title.capitalize()}"
-                    parsed.append(pr)
+# Prepare the data for rendering
+# We will create a dictionary with the sections and their changes
+# Also, we will handle dependencies separately for Go and Docker images
+# and format them accordingly
+catagories = {}
+dependencies_title = ""
+for title, changes in sections.items():
+    if any(x in title for x in ["Other Changes", "Documentation", "Maintenance", "Tests"]):
+        continue
+    parsed = []
+    go_dependencies = []
+    docker_dependencies = []
+    for line in changes:
+        change = re.search("^(.*) by @.* in (.*)$", line)
+        change_title = change.group(1)
+        pr_link = change.group(2)
+        pr_number = re.search(r"^.*pull/(\d+)$", pr_link).group(1)
+        if "Dependencies" in title:
+            dependencies_title = title
+            if "go group" in change_title or "go_modules group" in change_title:
+                change_title = "Bump Go dependencies"
+                pr = {"details": f"[{pr_number}]({pr_link})", "title": change_title}
+                go_dependencies.append(pr)
+            elif (
+                "Docker image update" in change_title
+                or "docker group" in change_title
+                or "docker-images group" in change_title
+                or "in /build" in change_title
+            ):
+                change_title = "Bump Docker dependencies"
+                pr = {"details": f"[{pr_number}]({pr_link})", "title": change_title}
+                docker_dependencies.append(pr)
             else:
                 pr = f"[{pr_number}]({pr_link}) {change_title.capitalize()}"
                 parsed.append(pr)
+        else:
+            pr = f"[{pr_number}]({pr_link}) {change_title.capitalize()}"
+            parsed.append(pr)
 
-        catagories[title] = parsed
+    catagories[title] = parsed
 
-    # print(catagories[dependencies_title])
-    go_dep_prs = "".join([f"{dep['details']}, " for dep in go_dependencies])
-    docker_dep_prs = "".join([f"{dep['details']}, " for dep in docker_dependencies])
-    go_dep_prs = f"{go_dep_prs.rstrip(', ')} {go_dependencies[0]['title']}"
-    docker_dep_prs = f"{docker_dep_prs.rstrip(', ')} {docker_dependencies[0]['title']}"
+# Add grouped dependencies to the Dependencies category
+catagories[dependencies_title].append(format_pr_groups(docker_dependencies))
+catagories[dependencies_title].append(format_pr_groups(go_dependencies))
+catagories[dependencies_title].reverse()
 
-    x = go_dep_prs.rsplit(",", 1)
-    go_dep_prs = " &".join(x)
-
-    x = docker_dep_prs.rsplit(",", 1)
-    docker_dep_prs = " &".join(x)
-
-    catagories[dependencies_title].append(docker_dep_prs)
-    catagories[dependencies_title].append(go_dep_prs)
-    catagories[dependencies_title].reverse()
-
+# Populates the data needed for rendering the template
+# The data will be passed to the Jinja2 template for rendering
 data = {
     "version": NIC_VERSION,
     "release_date": RELEASE_DATE,
@@ -127,6 +137,3 @@ data = {
 
 # Render with Jinja2
 print(template.render(**data))
-
-# To close connections after use
-g.close()
