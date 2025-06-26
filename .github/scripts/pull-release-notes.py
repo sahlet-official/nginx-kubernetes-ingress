@@ -103,15 +103,16 @@ if release_body is None:
 sections = parse_sections(release_body or "")
 
 # Prepare the data for rendering
-# We will create a dictionary with the sections and their changes
+# We will create a dictionary with the categories and their changes
 # Also, we will handle dependencies separately for Go and Docker images
 # and format them accordingly
 catagories = {}
 dependencies_title = ""
 for title, changes in sections.items():
     if any(x in title for x in ["Other Changes", "Documentation", "Maintenance", "Tests"]):
+        # These sections do not show up in the docs release notes
         continue
-    parsed = []
+    parsed_changes = []
     go_dependencies = []
     docker_dependencies = []
     for line in changes:
@@ -132,11 +133,11 @@ for title, changes in sections.items():
                 docker_dependencies.append(pr)
             # Treat this change like any other ungrouped change
             else:
-                parsed.append(f"{pr['details']} {pr['title']}")
+                parsed_changes.append(f"{pr['details']} {pr['title']}")
         else:
-            parsed.append(f"{pr['details']} {pr['title']}")
+            parsed_changes.append(f"{pr['details']} {pr['title']}")
 
-    catagories[title] = parsed
+    catagories[title] = parsed_changes
 
 # Add grouped dependencies to the Dependencies category
 catagories[dependencies_title].append(format_pr_groups(docker_dependencies, "Bump Docker dependencies"))
