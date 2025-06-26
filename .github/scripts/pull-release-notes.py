@@ -28,13 +28,27 @@ template = env.get_template("release-notes.j2")
 
 def parse_sections(markdown: str):
     sections = {}
-    current = None
+    section_name = None
     for line in markdown.splitlines():
+        # Check if the line starts with a section header
+        # Section headers start with "### "
+        # We will use the section header as the key in the sections dictionary
+        # and the lines below it as the values (until the next section header)
+        line = line.strip()
+        if not line:
+            continue  # skip empty lines
         if line.startswith("### "):
-            current = line[3:].strip()
-            sections[current] = []
-        elif (current and line.strip().startswith("* ")) and "made their first contribution" not in line:
-            sections[current].append(line.strip()[2:].strip())
+            section_name = line[3:].strip()
+            sections[section_name] = []
+        # If the line starts with "* " and contains "made their first contribution",
+        # we will skip it as it is not a change but a contributor note
+        elif section_name and line.startswith("* ") and "made their first contribution" in line:
+            continue
+        # Check if the line starts with "* " or "- "
+        # If it does, we will add the line to the current section
+        # We will also strip the "* " or "- " from the beginning of the line
+        elif section_name and line.strip().startswith("* "):
+            sections[section_name].append(line.strip()[2:].strip())
     return sections
 
 
@@ -92,6 +106,7 @@ for title, changes in sections.items():
     go_dependencies = []
     docker_dependencies = []
     for line in changes:
+        print(line)
         change = re.search("^(.*) by @.* in (.*)$", line)
         change_title = change.group(1)
         pr_link = change.group(2)
