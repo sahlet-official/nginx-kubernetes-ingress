@@ -15,3 +15,10 @@ keywords:
 maintainers:
   - name: nginx
     email: kubernetes@nginx.com
+
+dependencies:
+  - name: nginx-app-protect
+    condition: controller.appprotect.enable
+    import-values:
+      - child: appprotect
+        parent: controller.appprotect

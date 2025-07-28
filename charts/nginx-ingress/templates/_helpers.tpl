@@ -237,8 +237,10 @@ Build the args for the service binary.
 {{- if and .Values.controller.appprotect.enable .Values.controller.appprotect.logLevel }}
 - -app-protect-log-level={{ .Values.controller.appprotect.logLevel }}
 {{ end }}
-{{- if and .Values.controller.appprotect.enable .Values.controller.appprotect.v5 }}
-- -app-protect-enforcer-address="{{ .Values.controller.appprotect.enforcer.host | default "127.0.0.1" }}:{{ .Values.controller.appprotect.enforcer.port | default 50000 }}"
+{{- if .Values.controller.appprotect.enable }}
+{{- with index .Values.controller.appprotect.service.enforcer.ports 0 }}
+- -app-protect-enforcer-address="{{ include "nginx-ingress.fullname" $ }}-enforcer:{{ .port }}"
+{{- end }}
 {{- end }}
 - -enable-app-protect-dos={{ .Values.controller.appprotectdos.enable }}
 {{- if .Values.controller.appprotectdos.enable }}
