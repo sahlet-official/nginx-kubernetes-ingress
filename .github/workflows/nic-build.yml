@@ -136,7 +136,7 @@ jobs:
           version=${VERSION}
           tarball_dir=${TARBALL_DIR}
           releases=$(find "${directory}" -mindepth 1 -type d)
-          syft_binary=${SYFT_BIN"}
+          syft_binary=${SYFT_BIN}
           cosign_binary=${COSIGN_BIN:-"cosign"}
 
           if [ ! -d "${tarball_dir}" ]; then
