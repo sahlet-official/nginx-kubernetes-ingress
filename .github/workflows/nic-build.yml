@@ -17,7 +17,7 @@ on:
         required: true
         type: boolean
     secrets:
-      GITHUB_TOKEN:
+      token:
         description: 'GitHub token to use for the workflow'
         required: true
       ARTIFACTORY_USER:
@@ -113,7 +113,7 @@ jobs:
           version: latest
           args: build --snapshot --clean
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.token }}
           GOPATH: ${{ steps.vars.outputs.go_path }}
           GOPROXY: "https://azr.artifactory.f5net.com/artifactory/api/go/f5-nginx-go-dev"
           GORELEASER_CURRENT_TAG: "${{ inputs.tag }}"
