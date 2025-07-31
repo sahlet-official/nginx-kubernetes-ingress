@@ -182,4 +182,4 @@ jobs:
           path: ${{ github.workspace }}/tarballs
           name: ${{ steps.artifact_name.outputs.name }}
           overwrite: true
-        if: ${{ inputs.dry_run != 'true' }}
+        if: ${{ ! inputs.dry_run }}
