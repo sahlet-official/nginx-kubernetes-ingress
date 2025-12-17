@@ -89,6 +89,11 @@ jobs:
           echo "::add-mask::$NGINX_PAT"
           echo "NGINX_PAT=$NGINX_PAT" >> $GITHUB_OUTPUT
 
+      - name: Setup Golang Environment
+        uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6.1.0
+        with:
+          go-version-file: go.mod
+
       - name: Replace
         run: |
           .github/scripts/release-version-update.sh \
