@@ -37,11 +37,10 @@ jobs:
 
       - name: Build and push Docker image
         env:
-          # PREFIX: "${{ github.repository_owner }}/nginx-kubernetes-ingress"
           PREFIX: "ghcr.io/${{ github.repository_owner }}/nginx-kubernetes-ingress"
           TARGET: container
         #   TAG: "arm64_v${{ github.event.inputs.version }}"
-        #   ARCH: arm64
+          ARCH: arm64
         run: |
           # https://docs.nginx.com/nginx-ingress-controller/install/build/
 
@@ -56,6 +55,12 @@ jobs:
           make push
           echo "CUSTOM LOG: push end"
           echo "________________________________________"
+        working-directory: ${{ env.WORK_FOLDER }}
+
+      - name: Set git user
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
         working-directory: ${{ env.WORK_FOLDER }}
 
       - name: Create Git tags
