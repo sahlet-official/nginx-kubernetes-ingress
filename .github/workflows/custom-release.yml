@@ -37,8 +37,8 @@ jobs:
 
       - name: Build and push Docker image
         env:
-          PREFIX: "${{ github.repository_owner }}/nginx-kubernetes-ingress"
-          # PREFIX: "ghcr.io/${{ github.repository_owner }}/nginx-kubernetes-ingress"
+          # PREFIX: "${{ github.repository_owner }}/nginx-kubernetes-ingress"
+          PREFIX: "ghcr.io/${{ github.repository_owner }}/nginx-kubernetes-ingress"
           TARGET: container
         #   TAG: "arm64_v${{ github.event.inputs.version }}"
         #   ARCH: arm64
