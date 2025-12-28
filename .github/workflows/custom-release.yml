@@ -66,12 +66,12 @@ jobs:
           git push origin v${{ github.event.inputs.version }}
         working-directory: ${{ env.WORK_FOLDER }}
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ github.event.inputs.version }}
-          name: Release v${{ github.event.inputs.version }}
-          generate_release_notes: true
+      # - name: Create GitHub Release
+      #   uses: softprops/action-gh-release@v2
+      #   with:
+      #     tag_name: v${{ github.event.inputs.version }}
+      #     name: Release v${{ github.event.inputs.version }}
+      #     generate_release_notes: true
 
       - name: Cleanup
         if: always() && steps.create_wd.outcome == 'success'
