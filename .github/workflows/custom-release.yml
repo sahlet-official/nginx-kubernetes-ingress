@@ -1,0 +1,64 @@
+name: Custom release
+
+permissions:
+  contents: write
+  packages: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g. 1.2.3)'
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    env:
+      WORK_FOLDER: work-folder-very-unique-name
+
+    steps:
+      - name: Creating work folder
+        id: create_wd
+        run: mkdir "$WORK_FOLDER"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          path: ${{ env.WORK_FOLDER }}
+
+      - name: Set Docker Login info
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        env:
+          PREFIX: "${{ github.repository_owner }}/ingress-nginx"
+          TAG: "arm64_v${{ github.event.inputs.version }}"
+          ARCH: arm64
+          TARGET: container
+        run: |
+          make alpine-image
+          make push
+        working-directory: ${{ env.WORK_FOLDER }}
+
+      - name: Create Git tags
+        run: |
+          git tag -a v${{ github.event.inputs.version }} -m "Release v${{ github.event.inputs.version }}"
+          git push origin v${{ github.event.inputs.version }}
+        working-directory: ${{ env.WORK_FOLDER }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.event.inputs.version }}
+          name: Release v${{ github.event.inputs.version }}
+          generate_release_notes: true
+
+      - name: Cleanup
+        if: always() && steps.create_wd.outcome == 'success'
+        run: rm -r "$WORK_FOLDER"
