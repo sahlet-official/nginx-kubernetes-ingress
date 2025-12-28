@@ -1,0 +1,15 @@
+name: Custom release
+run-name: Custom release placeholder
+
+on:
+  workflow_dispatch:
+
+jobs:
+  placeholder-info:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: info (It is placeholder)
+        run: |
+          echo "It is placeholder in github actions UI"
+          echo "Run it on needed brunch (ref)"
