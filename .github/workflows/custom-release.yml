@@ -46,7 +46,7 @@ jobs:
           REGISTRY: "ghcr.io"
           PREFIX: "${{ github.repository_owner }}/nginx-kubernetes-ingress"
           TARGET: container
-        #   TAG: "arm64_v${{ github.event.inputs.version }}"
+          TAG: "arm64_v${{ github.event.inputs.version }}"
           ARCH: arm64
         run: |
           # https://docs.nginx.com/nginx-ingress-controller/install/build/
