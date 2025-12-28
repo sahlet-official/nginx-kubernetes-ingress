@@ -28,31 +28,31 @@ jobs:
         with:
           path: ${{ env.WORK_FOLDER }}
 
-      # - name: Setup QEMU for docker
-      #   uses: docker/setup-qemu-action@v3
+      - name: Setup QEMU for docker
+        uses: docker/setup-qemu-action@v3
       
-      # - name: Setup Buildx for docker
-      #   uses: docker/setup-buildx-action@v3
+      - name: Setup Buildx for docker
+        uses: docker/setup-buildx-action@v3
 
-      # - name: Set Docker Login info
-      #   uses: docker/login-action@v3
-      #   with:
-      #     registry: ghcr.io
-      #     username: ${{ github.actor }}
-      #     password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set Docker Login info
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Build and push Docker image
-      #   env:
-      #     REGISTRY: "ghcr.io"
-      #     PREFIX: "${{ github.repository_owner }}/nginx-kubernetes-ingress"
-      #     TARGET: container
-      #     TAG: "arm64_v${{ github.event.inputs.version }}"
-      #     ARCH: arm64
-      #   run: |
-      #     # https://docs.nginx.com/nginx-ingress-controller/install/build/
+      - name: Build and push Docker image
+        env:
+          REGISTRY: "ghcr.io"
+          PREFIX: "${{ github.repository_owner }}/nginx-kubernetes-ingress"
+          TARGET: container
+          TAG: "arm64_v${{ github.event.inputs.version }}"
+          ARCH: arm64
+        run: |
+          # https://docs.nginx.com/nginx-ingress-controller/install/build/
 
-      #     make buildx-push-alpine
-      #   working-directory: ${{ env.WORK_FOLDER }}
+          make buildx-push-alpine
+        working-directory: ${{ env.WORK_FOLDER }}
 
       - name: Set git user
         run: |
@@ -66,12 +66,12 @@ jobs:
           git push origin v${{ github.event.inputs.version }}
         working-directory: ${{ env.WORK_FOLDER }}
 
-      # - name: Create GitHub Release
-      #   uses: softprops/action-gh-release@v2
-      #   with:
-      #     tag_name: v${{ github.event.inputs.version }}
-      #     name: Release v${{ github.event.inputs.version }}
-      #     generate_release_notes: true
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.event.inputs.version }}
+          name: Release v${{ github.event.inputs.version }}
+          generate_release_notes: true
 
       - name: Cleanup
         if: always() && steps.create_wd.outcome == 'success'
