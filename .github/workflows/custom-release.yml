@@ -40,7 +40,7 @@ jobs:
           PREFIX: "${{ github.repository_owner }}/ingress-nginx"
           TAG: "arm64_v${{ github.event.inputs.version }}"
           ARCH: arm64
-          TARGET: container
+          TARGET: download
         run: |
           # https://docs.nginx.com/nginx-ingress-controller/install/build/
           make alpine-image PREFIX="${{ github.repository_owner }}/ingress-nginx" TARGET=download TAG="arm64_v${{ github.event.inputs.version }}" ARCH=arm64
