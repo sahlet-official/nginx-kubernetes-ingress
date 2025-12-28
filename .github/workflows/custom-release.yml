@@ -42,7 +42,8 @@ jobs:
           ARCH: arm64
           TARGET: container
         run: |
-          make alpine-image
+          # https://docs.nginx.com/nginx-ingress-controller/install/build/
+          make debian-image
           make push
         working-directory: ${{ env.WORK_FOLDER }}
 
