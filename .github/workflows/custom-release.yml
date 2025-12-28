@@ -44,6 +44,8 @@ jobs:
         run: |
           # https://docs.nginx.com/nginx-ingress-controller/install/build/
 
+          docker buildx create --name mybuilder --driver docker-container --use
+
           echo "________________________________________"
           echo "CUSTOM LOG: build start"
           make alpine-image
