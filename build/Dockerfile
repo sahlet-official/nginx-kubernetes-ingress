@@ -50,7 +50,7 @@ ADD --link --chown=101:0 https://raw.githubusercontent.com/nginx/k8s-common/main
 ADD --link --chown=101:0 https://raw.githubusercontent.com/nginx/k8s-common/main/files/agent-debian-12.repo debian-agent-12.sources
 ADD --link --chown=101:0 https://cs.nginx.com/static/files/nginx-agent.repo nginx-agent.repo
 
-RUN printf ${TARGETPLATFORM}
+RUN printf "%s\n" "${TARGETPLATFORM}"
 
 RUN --mount=from=busybox:musl,platform=linux/arm64,src=/bin/,dst=/bin/ printf "%s\n" "Acquire::https::pkgs.nginx.com::User-Agent k8s-ic-$IC_VERSION${BUILD_OS##debian-plus}-apt;" >> 90pkgs-nginx \
 	&& if ! grep -q "${PACKAGE_REPO}" 90pkgs-nginx ; then cat 90pkgs-nginx | sed -e "s/pkgs.nginx.com/${PACKAGE_REPO}/g" >> 90pkgs-nginx; fi \
