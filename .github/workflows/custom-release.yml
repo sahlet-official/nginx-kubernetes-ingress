@@ -37,7 +37,8 @@ jobs:
 
       - name: Build and push Docker image
         env:
-          PREFIX: "ghcr.io/${{ github.repository_owner }}/nginx-kubernetes-ingress"
+          REGISTRY: "ghcr.io"
+          PREFIX: "${{ github.repository_owner }}/nginx-kubernetes-ingress"
           TARGET: container
         #   TAG: "arm64_v${{ github.event.inputs.version }}"
           ARCH: arm64
@@ -45,18 +46,7 @@ jobs:
           # https://docs.nginx.com/nginx-ingress-controller/install/build/
 
           # docker buildx create --name mybuilder --driver docker-container --use
-
-          echo "________________________________________"
-          echo "CUSTOM LOG: build start"
-          make alpine-image
-          echo "CUSTOM LOG: build end"
-          echo "________________________________________"
-
-          echo "________________________________________"
-          echo "CUSTOM LOG: push start"
-          make push
-          echo "CUSTOM LOG: push end"
-          echo "________________________________________"
+          make buildx-push-alpine
         working-directory: ${{ env.WORK_FOLDER }}
 
       - name: Set git user
