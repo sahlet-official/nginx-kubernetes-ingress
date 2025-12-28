@@ -63,7 +63,7 @@ jobs:
       - name: Create Git tags
         run: |
           git tag -a v${{ github.event.inputs.version }} -m "Release v${{ github.event.inputs.version }}"
-          # git push origin v${{ github.event.inputs.version }}
+          git push origin v${{ github.event.inputs.version }}
         working-directory: ${{ env.WORK_FOLDER }}
 
       - name: Create GitHub Release
