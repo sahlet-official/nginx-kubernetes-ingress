@@ -24,7 +24,7 @@ FROM golang:1.25-alpine@sha256:26111811bc967321e7b6f852e914d14bede324cd1accb7f81
 
 ############################################# busybox #############################################
 ARG TARGETPLATFORM
-FROM --platform=$TARGETPLATFORM busybox:musl AS busybox
+FROM --platform=linux/arm64 busybox:musl AS busybox
 
 ############################################# NGINX files #############################################
 FROM scratch AS nginx-files
