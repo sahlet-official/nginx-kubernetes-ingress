@@ -268,3 +268,18 @@ update-crd-docs: ## Update CRD markdown documentation from YAML definitions
 	@echo "Generating CRD documentation..."
 	@go run hack/generate-crd-docs.go -crd-dir config/crd/bases -output-dir docs/crd
 	@echo "CRD documentation updated successfully!"
+
+.PHONY: buildx-push-alpine
+buildx-push-alpine:
+	@docker buildx create --use --bootstrap >/dev/null 2>&1 || true
+	docker buildx build \
+		--platform linux/$(strip $(ARCH)) \
+		$(strip $(DOCKER_BUILD_OPTIONS)) \
+		--target $(strip $(TARGET)) \
+		-f build/Dockerfile \
+		--build-arg BUILD_OS=alpine \
+		--build-arg NGINX_OSS_VERSION=$(NGINX_OSS_VERSION) \
+		--build-arg NGINX_AGENT_VERSION=$(NGINX_AGENT_VERSION) \
+		-t $(BUILD_IMAGE) \
+		--push \
+		.
