@@ -742,7 +742,7 @@ server {
         {{- end }}
 
         {{- if not ($custom_headers | hasCIKey "X-Forwarded-Proto") }}
-        {{ $proxyOrGRPC }}_set_header X-Forwarded-Proto {{ with $s.TLSRedirect }}{{ .BasedOn }}{{ else }}$scheme{{ end }};
+        {{ $proxyOrGRPC }}_set_header X-Forwarded-Proto {{ with $s.TLSRedirect }}{{ .BasedOn }}{{ else }}$http_x_forwarded_proto{{ end }};
         {{- end }}
 
         {{- range $h := $l.ProxySetHeaders }}
