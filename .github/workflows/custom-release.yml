@@ -36,15 +36,15 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image
-        env:
-          # PREFIX: "${{ github.repository_owner }}/ingress-nginx"
-          # TAG: "arm64_v${{ github.event.inputs.version }}"
-          # ARCH: arm64
-          # TARGET: container
+        # env:
+        #   PREFIX: "${{ github.repository_owner }}/ingress-nginx"
+        #   TAG: "arm64_v${{ github.event.inputs.version }}"
+        #   ARCH: arm64
+        #   TARGET: container
         run: |
           # https://docs.nginx.com/nginx-ingress-controller/install/build/
-          make alpine-image PREFIX="${{ github.repository_owner }}/ingress-nginx" TARGET=container TAG="arm64_v${{ github.event.inputs.version }}" ARCH=arm64
-          make push PREFIX="${{ github.repository_owner }}/ingress-nginx" TARGET=container TAG="arm64_v${{ github.event.inputs.version }}" ARCH=arm64
+          make alpine-image PREFIX="${{ github.repository_owner }}/ingress-nginx" TARGET=container
+          make push PREFIX="${{ github.repository_owner }}/ingress-nginx" TARGET=container
         working-directory: ${{ env.WORK_FOLDER }}
 
       - name: Create Git tags
